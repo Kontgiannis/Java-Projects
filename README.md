@@ -10,4 +10,4 @@ Self-made mini apps and projects in Java (mostly console-based) for practice.
 - FizzBuzz
 
 ## Tech
-Java, OOP, basic input validation, console menus
+Java 21 (Amazon Corretto), OOP, basic input validation, console menus
