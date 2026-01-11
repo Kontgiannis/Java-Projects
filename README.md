@@ -4,7 +4,7 @@ A collection of Java console applications developed during my training at **Codi
 
 ## 🚀 Featured Projects (in `/projects`)
 
-### 1. Library Management System (New!)
+### 1. [Library Management System (New!)](./projects/LibraryManagment)
 **Focus:** *Separation of Concerns, Java Streams, Service Layer Pattern*
 
 A robust library simulation that manages books, members, and loans completely in-memory. This project represents a step up in architecture, separating the User Interface (Console) from the Business Logic.
@@ -16,7 +16,7 @@ A robust library simulation that manages books, members, and loans completely in
     * **Robust Validation:** Inputs are protected against crashes; ISBNs and Dates are handled logically.
     * **Logic:** Calculates available copies dynamically based on active loans (Single Source of Truth).
 
-### 2. Contact Book
+### 2. [Contact Book](./projects/ContactBook)
 **Focus:** *CRUD Operations, Data Structures (Maps), Input Validation*
 
 A functional address book application that allows users to manage their contacts efficiently.
@@ -30,9 +30,9 @@ A functional address book application that allows users to manage their contacts
 ## 🕹️ Mini Apps (in `/mini_apps`)
 Smaller exercises focused on specific logic challenges:
 
-* **Guess Game:** A number guessing game implementing "lives" and retry logic.
-* **Entry System:** Logic gates for age checks and VIP access control.
-* **FizzBuzz:** The classic coding interview question implementation.
+* **[Guess Game](./mini_apps/GuessGame):** A number guessing game implementing "lives" and retry logic.
+* **[Entry System](./mini_apps/EntrySystem):** Logic gates for age checks and VIP access control.
+* **[FizzBuzz](./mini_apps/FizzBuzz):** The classic coding interview question implementation.
 
 ## 🛠️ Tech Stack
 * **Language:** Java 21 (Amazon Corretto)
