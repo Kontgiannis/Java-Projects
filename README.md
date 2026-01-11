@@ -1,4 +1,7 @@
 # Java Projects ☕
+![Java](https://img.shields.io/badge/Java-JDK_21-orange)
+![IDE](https://img.shields.io/badge/IDE-IntelliJ_IDEA-blue)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
 
 A collection of Java console applications developed during my training at **Coding Factory (AUEB)**. These projects demonstrate my progression from basic syntax to more complex Object-Oriented Design patterns and Data Structures.
 
