@@ -47,19 +47,23 @@ The repository is organized into two main categories:
 
 ```text
 Java-Projects/
-├── mini_apps/             # Logic puzzles & basic exercises
-│   ├── EntrySystem
-│   ├── FizzBuzz
-│   └── GuessGame
-│
-└── projects/              # Full-featured applications
-    ├── ContactBook/       # HashMap & CRUD demo
-    └── LibraryManagment/  # Advanced architecture demo
+└── src/
+    ├── mini_apps/             # Logic puzzles & basic exercises
+    │   ├── EntrySystem
+    │   ├── FizzBuzz
+    │   └── GuessGame
+    │
+    └── projects/              # Full-featured applications
+        ├── contactbook/       # HashMap & CRUD demo
+        └── librarymanagement/ # Advanced architecture demo
+            ├── domain/        # Entities (Book, Loan, Member)
+            ├── service/       # Business Logic (LibraryService)
+            └── ui/            # Entry point (LibraryApp)
 ```
 ## 🏃 How to Run
 1. Clone the repository.
 2. Open the folder in IntelliJ IDEA.
-3. Navigate to the specific file (e.g., projects/LibraryManagment/LibraryApp.java).
+3. Navigate to the entry point: `src/projects/librarymanagement/ui/LibraryApp.java`
 4. Right-click the class file and select Run.
 ##
 Created by Giannis as part of the Coding Factory curriculum.
