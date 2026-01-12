@@ -1,8 +1,11 @@
-package projects.LibraryManagement;
+package projects.librarymanagement.ui;
 
-import java.time.LocalDate;
+import projects.librarymanagement.domain.Book;
+import projects.librarymanagement.domain.Loan;
+import projects.librarymanagement.domain.Member;
+import projects.librarymanagement.service.LibraryService;
+
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Simple Library CLI app.
@@ -65,7 +68,7 @@ public class LibraryApp {
     private static void registerMember( Scanner sc, LibraryService service) {
         System.out.println("*** Registering member ***");
         String name = readNonBlank(sc, "Name: ");
-        String email = readOptionalEmail(sc, "Email (optional): "); // optional
+        String email = readEmail(sc, "Email (optional): "); // optional
         Member m = service.registerMember(name, email);
         System.out.println("Member registered. ID: " + m.getId());
     }
@@ -144,10 +147,10 @@ public class LibraryApp {
     private static void updateMemberEmail(Scanner sc, LibraryService service) {
         System.out.println("*** Updating member email ***");
         long memberId = readLong(sc, "Member ID: ");
-        // optional email: blank -> null (means "remove email")
-        String newEmail = readOptionalEmail(sc, "New Email (leave blank to remove): ");
+        // email is required ( validated by readEmail)
+        String newEmail = readEmail(sc, "New Email: ");
         boolean ok = service.updateMemberEmail(memberId, newEmail);
-        System.out.println((ok) ? "Email updated successfully!" : "Update failed ( member not found)");
+        System.out.println((ok) ? "Email updated successfully!" : "Update failed ( member not found / invalid email)");
     }
 
     private static void viewMemberDetails(Scanner sc, LibraryService service) {
@@ -161,10 +164,11 @@ public class LibraryApp {
         System.out.println("ID: " + m.getId());
         System.out.println("Name: " + m.getName());
         System.out.println("Email: " + (m.getEmail().isBlank() ? "(none)" : m.getEmail()));
-        List<Loan> loans = service.listLoansByMember(memberId);
-        int totalLoans = loans.size();
-        long activeLoans = loans.stream().filter(Loan::isActive).count();
-        System.out.println("Loans: " + totalLoans + " active loans: " + activeLoans);
+        Map<Long, LibraryService.LoanStats> stats = service.computeLoanStatsByMember();
+        LibraryService.LoanStats stat = stats.get(memberId);
+        int totalLoans = (stat == null) ? 0 : stat.getTotal();
+        long activeLoans = (stat == null) ? 0 : stat.getTotal();
+        System.out.println("Loans: " + totalLoans + " | active loans: " + activeLoans);
     }
 
     private static void listMembers(LibraryService service) {
@@ -177,8 +181,8 @@ public class LibraryApp {
         Map<Long, LibraryService.LoanStats> stats = service.computeLoanStatsByMember();
         for(Member m : members){
             LibraryService.LoanStats s = stats.get(m.getId());
-            int totalLoans = (s == null) ? 0 : s.total;
-            int activeLoans = (s == null) ? 0 : s.active;
+            int totalLoans = (s == null) ? 0 : s.getTotal();
+            int activeLoans = (s == null) ? 0 : s.getActive();
             String email = m.getEmail().isBlank() ? "(none)" : m.getEmail();
             System.out.println("ID: " + m.getId() + " | Name: " + m.getName() + " | Email: " + email
             + " | Total loans: " + totalLoans + " | Active loans: " + activeLoans);
@@ -251,12 +255,15 @@ public class LibraryApp {
         }
     }
 
-    private static String readOptionalEmail(Scanner sc, String prompt){
+    private static String readEmail(Scanner sc, String prompt){
         while(true){
             System.out.print(prompt);
             String e = readLineOrExit(sc);
-            if (e.isEmpty()) return null; // optional
-            if(isEmailLike(e)) return e;
+            if (e.isBlank()) {
+                System.out.println("Email is required.");
+                continue;
+            }
+            if(isEmailLike(e)) return e.trim();
             System.out.println("Email looks invalid. Try again or leave it blank.");
         }
     }
@@ -280,205 +287,6 @@ public class LibraryApp {
                 continue;
             }
             return isbn.toUpperCase();
-        }
-    }
-
-    //---------------------------------- DOMAIN -------------------------------------------
-    static class Book {
-        private final String isbn; //PK unique
-        private final String title;
-        private final String author;
-        private final int totalCopies;
-
-        public Book(String isbn, String title, String author, int totalCopies) {
-            this.isbn = isbn;
-            this.title = title;
-            this.author = author;
-            this.totalCopies = totalCopies;
-        }
-
-        public String getIsbn() {return isbn;}
-        public String getTitle() {return title;}
-        public String getAuthor() {return author;}
-        public int getTotalCopies() {return totalCopies;}
-
-        public String pretty(int available) {
-            return String.format("%s | %s | %s | available %d/%d", isbn, title, author, available, totalCopies);
-        }
-    }
-
-    static class Member {
-        private final long id; // PK immutable
-        private final String name;
-        private String email;
-        public Member(long id, String name, String email) {
-            this.id = id;
-            this.name = name;
-            this.email = email;
-        }
-
-        public long getId() {return id;}
-        public String getName() {return name;}
-        public String getEmail() {return (email == null) ? "" : email;}
-
-        public void setEmail(String email) {this.email = email;}
-    }
-
-    static class Loan {
-        private final long id;
-        private final String isbn;
-        private final long memberId;
-        private final LocalDate loanDate;
-        private final LocalDate dueDate;
-        private LocalDate returnDate;
-
-        public Loan(long id, String isbn, long memberId, LocalDate loanDate, LocalDate dueDate) {
-            this.id = id;
-            this.isbn = isbn;
-            this.memberId = memberId;
-            this.loanDate = loanDate;
-            this.dueDate = dueDate;
-        }
-
-        public long getId() {return id;}
-        public String getIsbn() {return isbn;}
-        public long getMemberId() {return memberId;}
-        public LocalDate getDueDate() {return dueDate;}
-        public boolean isActive() {return returnDate == null;}
-
-        public void markReturned(LocalDate date) {this.returnDate = date;}
-
-        public String pretty() {
-            String status = isActive() ? "ACTIVE" : "RETURNED ON : " + returnDate;
-            return String.format("Loan#%d | ISBN = %s | member = %d | loan = %s | due = %s | %s",
-                    id, isbn, memberId, loanDate, dueDate, status);
-        }
-    }
-
-    //----------------------- SERVICE (in-memory "DAO") -----------------------------------
-    static class LibraryService {
-        private final Map<String, Book> booksByIsbn = new HashMap<>();
-        private final Map<Long, Member> membersById = new HashMap<>();
-        private final Map<Long, Loan> loansById = new HashMap<>();
-
-        // counts active loans per ISBN ( so we can support multiple copies)
-        private final Map<String, Integer> activeLoansCountByIsbn = new HashMap<>();
-
-        private long nextMemberId = 1L;
-        private long nextLoanId = 1L;
-
-        public Book addBook(String isbn, String title, String author, int totalCopies) {
-            if(booksByIsbn.containsKey(isbn)) return null;
-            Book b = new Book(isbn, title, author, totalCopies);
-            booksByIsbn.put(isbn, b);
-            activeLoansCountByIsbn.put(isbn, 0);
-            return b;
-        }
-
-        public Member registerMember(String name, String email) {
-            long id = nextMemberId++;
-            Member m = new Member(id, name, email);
-            membersById.put(id, m);
-            return m;
-        }
-
-        public List<Book> listBooksSortedByTitle() {
-            return  booksByIsbn.values().stream()
-                    .sorted(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER))
-                    .collect(Collectors.toList());
-        }
-
-        public List<Book> searchBooksByTitlePrefix(String prefix) {
-            String p = prefix.toLowerCase();
-            return booksByIsbn.values().stream()
-                    .filter(b -> b.getTitle().toLowerCase().startsWith(p))
-                    .sorted(Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER))
-                    .collect(Collectors.toList());
-        }
-
-        public int availableCopies(String isbn) {
-            Book b = booksByIsbn.get(isbn);
-            if(b == null) return 0;
-            int active = activeLoansCountByIsbn.getOrDefault(isbn, 0);
-            return b.getTotalCopies() - active;
-        }
-
-        public Loan borrow(String isbn, long memberId) {
-            Book b = booksByIsbn.get(isbn);
-            Member m = membersById.get(memberId);
-            if(b == null || m == null) return null;
-            if(availableCopies(isbn) <= 0) return null;
-            long id = nextLoanId++;
-            LocalDate now = LocalDate.now();
-            LocalDate dueDate = now.plusDays(14); // simple rule 2 weeks
-
-            Loan loan = new Loan(id, isbn, memberId, now, dueDate);
-            loansById.put(id, loan);
-            activeLoansCountByIsbn.put(isbn, activeLoansCountByIsbn.getOrDefault(isbn, 0) + 1);
-            return loan;
-        }
-
-        public boolean returnLoan(long loanId) {
-            Loan loan = loansById.get(loanId);
-            if(loan == null || !loan.isActive()) return false;
-            loan.markReturned(LocalDate.now());
-            String isbn = loan.getIsbn();
-            int active = activeLoansCountByIsbn.getOrDefault(isbn, 0);
-            activeLoansCountByIsbn.put(isbn, Math.max(0, active - 1));
-            return true;
-        }
-
-        public List<Loan> listActiveLoansSortedByDueDate() {
-            return loansById.values().stream()
-                    .filter(Loan::isActive)
-                    .sorted(Comparator.comparing(Loan::getDueDate))
-                    .collect(Collectors.toList());
-        }
-
-        public List<Loan> listLoansByMember(long memberId) {
-            if(!membersById.containsKey(memberId)) return Collections.emptyList();
-            return loansById.values().stream()
-                    .filter( l -> l.getMemberId() == memberId)
-                    .sorted(Comparator.comparing(Loan::getId))
-                    .collect(Collectors.toList());
-        }
-
-        public boolean updateMemberEmail(long memberId, String email) {
-            Member m = membersById.get(memberId);
-            if(m == null) return false;
-            // email is either null (remove) or already validated by readOptionalEmail()
-            m.setEmail(email);
-            return true;
-        }
-
-        public Member findMemberById(long memberId) {
-            return membersById.get(memberId);
-        }
-
-        public List<Member> listMembersSortedByName() {
-            return membersById.values().stream()
-                    .sorted(Comparator.comparing(Member::getName, String.CASE_INSENSITIVE_ORDER))
-                    .collect(Collectors.toList());
-        }
-
-        static class LoanStats {
-            int total;
-            int active;
-        }
-
-        public Map<Long, LoanStats> computeLoanStatsByMember() {
-            Map<Long, LoanStats> stats = new HashMap<>();
-            for(Loan loan : loansById.values()) {
-                long memberId = loan.getMemberId();
-                LoanStats s = stats.get(memberId);
-                if(s == null) {
-                    s = new LoanStats();
-                    stats.put(memberId, s);
-                }
-                s.total++;
-                if(loan.isActive()) s.active++;
-            }
-            return stats;
         }
     }
 }

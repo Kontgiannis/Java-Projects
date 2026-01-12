@@ -7,7 +7,7 @@ A collection of Java console applications developed during my training at **Codi
 
 ## 🚀 Featured Projects (in `/projects`)
 
-### 1. [Library Management System (New!)](src/projects/LibraryManagement)
+### 1. [Library Management System (New!)](src/projects/librarymanagement)
 **Focus:** *Separation of Concerns, Java Streams, Service Layer Pattern*
 
 A robust library simulation that manages books, members, and loans completely in-memory. This project represents a step up in architecture, separating the User Interface (Console) from the Business Logic.
@@ -19,7 +19,7 @@ A robust library simulation that manages books, members, and loans completely in
     * **Robust Validation:** Inputs are protected against crashes; ISBNs and Dates are handled logically.
     * **Logic:** Calculates available copies dynamically based on active loans (Single Source of Truth).
 
-### 2. [Contact Book](src/projects/ContactBook)
+### 2. [Contact Book](src/projects/contactbook)
 **Focus:** *CRUD Operations, Data Structures (Maps), Input Validation*
 
 A functional address book application that allows users to manage their contacts efficiently.

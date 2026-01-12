@@ -1,4 +1,4 @@
-package projects.ContactBook;
+package projects.contactbook;
 
 import java.util.*;
 import java.util.stream.Collectors;
