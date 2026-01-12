@@ -5,7 +5,7 @@
 
 A collection of Java console applications developed during my training at **Coding Factory (AUEB)**. These projects demonstrate my progression from basic syntax to more complex Object-Oriented Design patterns and Data Structures.
 
-## 🚀 Featured Projects (in `/projects`)
+## 🚀 Featured Projects (in `src/projects`)
 
 ### 1. [Library Management System (New!)](src/projects/librarymanagement)
 **Focus:** *Separation of Concerns, Java Streams, Service Layer Pattern*
@@ -30,7 +30,7 @@ A functional address book application that allows users to manage their contacts
 
 ---
 
-## 🕹️ Mini Apps (in `/mini_apps`)
+## 🕹️ Mini Apps (in `src/mini_apps`)
 Smaller exercises focused on specific logic challenges:
 
 * **[Guess Game](src/mini_apps/GuessGameApp.java):** A number guessing game implementing "lives" and retry logic.
