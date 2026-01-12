@@ -167,7 +167,7 @@ public class LibraryApp {
         Map<Long, LibraryService.LoanStats> stats = service.computeLoanStatsByMember();
         LibraryService.LoanStats stat = stats.get(memberId);
         int totalLoans = (stat == null) ? 0 : stat.getTotal();
-        long activeLoans = (stat == null) ? 0 : stat.getTotal();
+        long activeLoans = (stat == null) ? 0 : stat.getActive();
         System.out.println("Loans: " + totalLoans + " | active loans: " + activeLoans);
     }
 
@@ -264,7 +264,7 @@ public class LibraryApp {
                 continue;
             }
             if(isEmailLike(e)) return e.trim();
-            System.out.println("Email looks invalid. Try again or leave it blank.");
+            System.out.println("Email looks invalid. Please try again.");
         }
     }
 
