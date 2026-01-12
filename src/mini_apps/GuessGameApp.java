@@ -22,7 +22,6 @@ public class GuessGameApp {
         Scanner reader = new Scanner(System.in);
         while (run) {
             genNum = (int) (Math.random() * 101);
-            System.out.println("Generated Number is: " + genNum);
             retries = MAX_TRIES;
 
             // Start of retries loop
