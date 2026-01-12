@@ -53,16 +53,15 @@ public class EntrySystemApp {
         // Entry check
         if (age < AGE) {
             System.out.print("Access Denied");
-        } else if (type != VIP) {
-            if (age >= 100) {
-                System.out.println("How the hell are you still alive ?!"); // Easter egg
-            }
-            System.out.print("Regular access granted - but not VIP");
         } else {
             if (age >= 100) {
                 System.out.println("How the hell are you still alive ?!"); // Easter egg
             }
-            System.out.print("Welcome Sir");
+            if (type != VIP) {
+                System.out.print("Regular access granted - but not VIP");
+            } else {
+                System.out.print("Welcome Sir");
+            }
         }
         scanner.close();
     }
